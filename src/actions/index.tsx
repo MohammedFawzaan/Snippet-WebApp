@@ -2,7 +2,18 @@
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation";
 
-export const SaveSnipppet = async(id: number,code: string) => {
+export const CreateSnippet = async (title: string, code: string ) => {
+    const snippet = await prisma.snippets.create({
+        data: {
+            title,
+            code,
+        },
+    })
+    console.log(snippet)
+    redirect("/")
+}
+
+export const SaveSnipppet = async (id: number, code: string) => {
     await prisma.snippets.update({
         where: { id },
         data: { code }
@@ -10,9 +21,9 @@ export const SaveSnipppet = async(id: number,code: string) => {
     redirect(`/snippet/${id}`);
 }
 
-export const DeleteSnippet = async(id: number) => {
+export const DeleteSnippet = async (id: number) => {
     await prisma.snippets.delete({
-        where: {id}
+        where: { id }
     });
     redirect("/");
 }

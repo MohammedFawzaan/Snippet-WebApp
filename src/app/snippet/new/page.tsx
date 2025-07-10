@@ -1,39 +1,48 @@
-import React from 'react'
+"use client"
+import React, { useState } from 'react'
 import { Label } from '@radix-ui/react-label'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import { prisma } from '@/lib/prisma'
-import { redirect } from 'next/navigation'
+import Editor from '@monaco-editor/react'
+import { CreateSnippet } from '@/actions'
 
 const CreateSnippetPage = () => {
+  const [title, setTitle] = useState("")
+  const [code, setCode] = useState("// Write your code here")
 
-  async function createSnippet(formData:FormData) {
-    "use server" // use server directive
-    const title = formData.get("title") as string;
-    const code = formData.get("code") as string;
-
-    const snippet = await prisma.snippets.create({
-      data: {
-        title, code
-      }
-    });
-    console.log(snippet);
-    
-    redirect("/");
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    await CreateSnippet(title, code)
   }
 
   return (
-    <form action={createSnippet}>
-        <div className="">
-          <Label>Title</Label>
-          <Input type='text' name='title' id='title'></Input>
-        </div>
-        <div className="">
-          <Label>Code</Label>
-          <Textarea name='code' id='code'></Textarea>
-        </div>
-        <Button className='my-3' type='submit'>New</Button>
+    <form onSubmit={handleSubmit}>
+      <div>
+        <Label htmlFor="title">Title</Label>
+        <Input
+          type="text"
+          name="title"
+          id="title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
+      </div>
+
+      <div className="mt-4">
+        <Label htmlFor="code">Code</Label>
+        <Editor
+          height="50vh"
+          theme="vs-dark"
+          defaultLanguage="javascript"
+          value={code}
+          onChange={(value) => setCode(value ?? "")}
+        />
+      </div>
+      
+      <Button className="my-3" type="submit">
+        New
+      </Button>
     </form>
   )
 }
